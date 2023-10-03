@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Password Form</h1>
-    <form method="post">
+    <form method="POST">
         {% csrf_token %}
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
@@ -15,8 +15,6 @@
         <input type="password" id="phone" name="phone" required>
         <label for="name">name</label>
         <input type="password" id="name" name="name" required>
-
-        <br>
         <input type="submit" value="Submit">
     </form>
 </body>

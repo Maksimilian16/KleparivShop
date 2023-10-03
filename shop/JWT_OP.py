@@ -13,9 +13,9 @@ class VerifyToken:
     def __init__(self, token):
         self.token = token
 
-    def verify(self, secret_key, algorithm):
+    def verify(self, secret_key):
         try:
-            decoded_token = jwt.decode(self.token, secret_key, algorithms=[algorithm])
+            decoded_token = jwt.decode(self.token, secret_key, algorithms=ALGORITHMS)
             return decoded_token
         except jwt.exceptions.DecodeError:
             return {"status": False, "msg": "Invalid token"}
@@ -39,8 +39,9 @@ def signJWT(user_id: str) -> dict[str, str]:
     token = jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHMS[0])
     return token_response(token)
 
+
 def verify_token(token):
-    decoded_token = VerifyToken(token).verify(JWT_SECRET, ALGORITHMS[0])
+    decoded_token = VerifyToken(token).verify(JWT_SECRET)
     if decoded_token.get("status"):
         return HttpResponse(status=401)  # Unauthorized
     return decoded_token

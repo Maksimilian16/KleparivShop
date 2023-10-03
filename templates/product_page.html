@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Description Form</title>
+</head>
+<body>
+    <h2>Enter Product Description</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="id_"></textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
