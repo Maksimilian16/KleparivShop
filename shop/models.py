@@ -10,7 +10,9 @@ class User(models.Model):
 
 class Product(models.Model):
     __table__ = "shop_product"
+    image = models.BinaryField()
     name = models.CharField(max_length=24)
     description = models.CharField(max_length=160)
     price = models.FloatField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+

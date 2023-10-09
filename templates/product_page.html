@@ -1,15 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Product Description Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Product Detail</title>
+    <!-- Add your CSS stylesheets and links to external CSS files here -->
 </head>
 <body>
-    <h2>Enter Product Description</h2>
-    <form method="post">
-        {% csrf_token %}
-        <label for="description">Description:</label><br>
-        <textarea id="description" name="id_"></textarea><br><br>
-        <input type="submit" value="Submit">
-    </form>
+    <header>
+        <h1>{{ product.name }}</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>Product Details</h2>
+            <div>
+                <p><strong>Name:</strong> {{ product.name }}</p>
+                <p><strong>Description:</strong> {{ product.description }}</p>
+                <p><strong>Price:</strong> ${{ product.price }}</p>
+                <p><strong>Author Phone:</strong> {{ product.author.phone }}</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Product Image</h2>
+            <div>
+                <!-- Display the image -->
+                <img src="data:image;base64,{{ image }}" alt="{{ photo_name }}">
+            </div>
+        </section>
+    </main>
+
+    <footer>
+    </footer>
+
 </body>
 </html>
