@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'shop.apps.ShopConfig',
+    'rest_framework.authtoken',
     'rest_framework',
     'drf_yasg',
     'django.contrib.admin',
@@ -140,6 +141,14 @@ JWT_AUTH = {
     'JWT_ALGORITHM': 'HS256',
     'JWT_ALLOW_REFRESH': True,
 }
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+}
+
 
 engine = create_engine('postgresql://docker:postgresql@localhost:5432/shop')
 Base = declarative_base()

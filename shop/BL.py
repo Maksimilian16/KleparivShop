@@ -1,50 +1,56 @@
-from .JWT_OP import create_access_token, verify_token
-from .models import User, Product
+from .JWT_OP import create_access_token, VerifyToken
+from .models import CustomUser, Product
 from django.http import JsonResponse
-from .forms import Products
 from django.shortcuts import get_object_or_404
 from base64 import b64encode
+from django.core.exceptions import ObjectDoesNotExist
+import jwt
+from KleparivShop.settings import JWT_AUTH
+from django.contrib.auth import authenticate, login, logout
 
 
 def create_user(request):
     phone = request.POST.get('phone', '')
     name = request.POST.get('name', '')
     password = request.POST.get('password', '')
-    if User.objects.filter(phone_number=phone).exists():
+    try:
+        obj = CustomUser.objects.get(phone_number=phone)
+    except ObjectDoesNotExist:
+        obj = None
+
+    if obj is not None:
         return JsonResponse({'message': 'This phone is already owned'})
     else:
-        user = User(phone_number=phone, name=name, password=password)
+        user = CustomUser(phone_number=phone, name=name, password=password)
         user.save()
-        return JsonResponse({'message': 'Account created',
-                             'jwt_code': str(create_access_token({'phone':phone}))})
+        request.session['login'] = create_access_token({'user': phone})
+        print(request.session.get('login'))
+        return JsonResponse({'message': 'Account created'})
 
 
 def login_user(request):
     phone = request.POST.get('phone', '')
     password = request.POST.get('password', '')
-    if User.objects.filter(phone_number=phone, password=password).exists() is not None:
-        return create_access_token({'phone': phone})
+    user = CustomUser.objects.get(phone_number=phone, password=password)
+    if user:
+        user_token = create_access_token({'user': phone})
+        request.session['login'] = str(user_token)
     else:
         return "that`s wrong information"
 
 
 def product_register(request):
-    form = Products(request.POST, request.FILES)
     description = request.POST.get('description', '')
     name = request.POST.get('name', '')
     price = request.POST.get('price', '')
     photo = request.FILES['photo'].read()
-    user_phone_number = verify_token(request.POST.get('phone_number', ''))
-
-    try:
-        author = User.objects.get(phone_number=user_phone_number['phone'])
-    except User.DoesNotExist:
-        return JsonResponse({'message': 'User not found'})
+    user = (VerifyToken(request.session.get('login')).verify())
+    print(jwt.decode(request.session.get('login'), JWT_AUTH['JWT_SECRET_KEY'], algorithms=JWT_AUTH['JWT_ALGORITHM']))
     product = Product.objects.create(
         name=name,
         description=description,
         price=price,
-        author=author,
+        author=CustomUser.objects.get(phone_number=user["user"]),
         image=photo
     )
     product.save()
@@ -61,9 +67,12 @@ def product_page(prod_id):
 
 
 def user_page(user_id):
-    obj = get_object_or_404(User, id=user_id)
+    obj = get_object_or_404(CustomUser, id=user_id)
     return f"name: {obj.name}\n phone: {obj.phone_number}\n "
 
 
 def products_show(prod_id):
-    return JsonResponse(Product.objects.filter(id=prod_id).values('name', 'description', 'price', 'author_id').first())
+    products = Product.objects.all()
+    for product in products:
+        product.encoded_image = b64encode(product.image).decode('utf-8')
+    return products

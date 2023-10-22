@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from .models import User
+from django.contrib import messages
 from .BL import create_user, login_user, product_register, product_page, user_page, products_show
 from .forms import Products
 
@@ -35,6 +35,15 @@ def user_view(request, user_id):
     return HttpResponse(user_page(user_id))
 
 
-#зробити ссилку, щоб можна було переходити на товар та шукати товари
+# зробити ссилку, щоб можна було переходити на товар та шукати товари
 def products_view(request):
     return render(request, 'main.html', {"products": products_show(request)})
+
+
+def test(request):
+    session_value = request.session.get('login')
+    if session_value:
+        return HttpResponse(session_value)
+    else:
+        request.session['my_session'] = 'Hello, World'
+        return HttpResponse("Сеанс установлен")

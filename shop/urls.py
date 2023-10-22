@@ -17,10 +17,12 @@ Including another URLconf
 from django.urls import path
 from shop.admin import admin
 from . import views
+from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("test/", views.test, name="test"),
     path("admin/", admin.site.urls),
     path("user/register", views.user_creating, name="user_creating"),
     path("user/login", views.login, name="login"),

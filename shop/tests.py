@@ -1,3 +1,12 @@
 from django.test import TestCase
 
-# Create your tests here.
+
+def func(an):
+    return 12
+
+
+@func
+def ll(x):
+    return x
+
+ll(12)
