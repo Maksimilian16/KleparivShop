@@ -22,7 +22,7 @@
                 <td>{{ product.description }}</td>
                 <td>${{ product.price }}</td>
                 <td>{{ product.author.username }}</td>
-                <td><img src="data:image/jpeg;base64,{{ product.encoded_image }}" alt="{{ product.name }}" /></td>
+                <td><img src="data:image/jpeg;base64,{{ product.encoded_image }}" alt="{{ product.name }}" width="200" /></td>
             </tr>
             {% endfor %}
         </tbody>

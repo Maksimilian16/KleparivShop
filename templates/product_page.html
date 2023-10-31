@@ -18,14 +18,13 @@
                 <p><strong>Name:</strong> {{ product.name }}</p>
                 <p><strong>Description:</strong> {{ product.description }}</p>
                 <p><strong>Price:</strong> ${{ product.price }}</p>
-                <p><strong>Author Phone:</strong> {{ product.author.phone }}</p>
+                <p><strong>Author Phone:</strong> {{ product.author.phone_number }}</p>
             </div>
         </section>
 
         <section>
             <h2>Product Image</h2>
             <div>
-                <!-- Display the image -->
                 <img src="data:image;base64,{{ image }}" alt="{{ photo_name }}">
             </div>
         </section>

@@ -4,9 +4,6 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from base64 import b64encode
 from django.core.exceptions import ObjectDoesNotExist
-import jwt
-from KleparivShop.settings import JWT_AUTH
-from django.contrib.auth import authenticate, login, logout
 
 
 def create_user(request):
@@ -24,7 +21,6 @@ def create_user(request):
         user = CustomUser(phone_number=phone, name=name, password=password)
         user.save()
         request.session['login'] = create_access_token({'user': phone})
-        print(request.session.get('login'))
         return JsonResponse({'message': 'Account created'})
 
 
@@ -44,8 +40,7 @@ def product_register(request):
     name = request.POST.get('name', '')
     price = request.POST.get('price', '')
     photo = request.FILES['photo'].read()
-    user = (VerifyToken(request.session.get('login')).verify())
-    print(jwt.decode(request.session.get('login'), JWT_AUTH['JWT_SECRET_KEY'], algorithms=JWT_AUTH['JWT_ALGORITHM']))
+    user = VerifyToken(request.session.get('login')).verify()
     product = Product.objects.create(
         name=name,
         description=description,
@@ -58,7 +53,7 @@ def product_register(request):
 
 
 def product_page(prod_id):
-    x = get_object_or_404(Product, id=prod_id)
+    x = get_object_or_404(Product, id=prod_id, visible=True)
     photo = b64encode(x.image).decode('utf-8')
     if x:
         return {'product': x, 'image': photo, 'photo_name': x.name}
@@ -66,9 +61,13 @@ def product_page(prod_id):
         return {'product': x, 'image': photo, 'photo_name': 'there is no photo'}
 
 
-def user_page(user_id):
+def user_page(request, user_id):
     obj = get_object_or_404(CustomUser, id=user_id)
-    return f"name: {obj.name}\n phone: {obj.phone_number}\n "
+    products = obj.products.filter(visible=True)
+    editable = "edit" if user_id == VerifyToken(request.session.get('login')).verify()['user'] else None
+    for product in products:
+        product.encoded_image = b64encode(product.image).decode('utf-8')
+    return {"name": obj.name, "phone": obj.phone_number, "products": products, 'editable': editable}
 
 
 def products_show(prod_id):
@@ -76,3 +75,14 @@ def products_show(prod_id):
     for product in products:
         product.encoded_image = b64encode(product.image).decode('utf-8')
     return products
+
+
+def edit(request, id_):
+    product = get_object_or_404(Product, id=id_)
+    match product.visible:
+        case True:
+            product.visible = False
+        case False:
+            product.visible = True
+    product.save()
+    return "product edited"

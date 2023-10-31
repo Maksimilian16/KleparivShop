@@ -1,8 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.http import HttpResponse
-from django.contrib import messages
-from .BL import create_user, login_user, product_register, product_page, user_page, products_show
+from .JWT_OP import VerifyToken
+from .BL import create_user, login_user, product_register, product_page, user_page, products_show, edit
 from .forms import Products
+from .models import Product
 
 
 def index(request):
@@ -32,7 +33,7 @@ def product_view(request, prod_id):
 
 
 def user_view(request, user_id):
-    return HttpResponse(user_page(user_id))
+    return render(request, 'user.html', user_page(request, user_id))
 
 
 # зробити ссилку, щоб можна було переходити на товар та шукати товари
@@ -47,3 +48,13 @@ def test(request):
     else:
         request.session['my_session'] = 'Hello, World'
         return HttpResponse("Сеанс установлен")
+
+
+def edit_product(request, prod_id):
+    session = VerifyToken(request.session.get('login')).verify()['user']
+    if session != Product.objects.get(id=prod_id).author.phone_number:
+        return HttpResponse("you are not owner of this product")
+    if request.POST:
+        return HttpResponse(edit(request, prod_id))
+    return render(request, 'edit.html')
+

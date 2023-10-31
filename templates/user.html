@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Title</title>
 </head>
-<body>
-$END$
+    name: {{ name }}
+    <br>
+    phone: {{ phone }}
+    {% for product in products %}
+        <hr>
+        <a href="/products/{{ product.id }}">
+            <img src="data:image/jpeg;base64,{{ product.encoded_image }}" alt="{{ product.name }}" width="200"/>
+            {{ product.name }}
+            {{ product.price }}
+            {{ product.description }}
+        </a>
+        <a href="/products/edit/{{ product.id }}">{{ editable }}</a>
+    {% endfor %}
 </body>
 </html>
